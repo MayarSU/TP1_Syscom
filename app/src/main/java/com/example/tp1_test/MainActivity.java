@@ -1,5 +1,6 @@
 package com.example.tp1_test;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -24,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     public void dessiner(View view) {
-        TextView editText = (TextView) findViewById(R.id.monTexte);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) TextView editText = (TextView) findViewById(R.id.monTexte);
         editText.setText("YES !!!");
+        setContentView(R.layout.gestionaire2);
     }
 }
