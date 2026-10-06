@@ -6,6 +6,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -14,8 +18,11 @@ import android.view.View;
 
 public class MonView extends View {
 
-    // Coordonnées pour détecter le mouvement
+    // Coordonnées pour les mouvements tactiles
     float x1, x2, y1, y2;
+
+    // Valeurs de l'accéléromètre
+    private int pencheH, pencheV, penche;
 
     // Timer
     Handler timerHandler = new Handler();
@@ -33,10 +40,14 @@ public class MonView extends View {
     public MonView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        // Démarrage du timer
+        // -------------------------
+        // TIMER
+        // -------------------------
         timerHandler.postDelayed(updateTimerThread, 10);
 
-        // Listener pour détecter les mouvements tactiles
+        // -------------------------
+        // TOUCH / SWIPE
+        // -------------------------
         OnTouchListener onTouchListener = new OnTouchListener() {
 
             @Override
@@ -64,7 +75,6 @@ public class MonView extends View {
                         dx = x2 - x1;
                         dy = y2 - y1;
 
-                        // Mouvement principalement horizontal
                         if (Math.abs(dx) > Math.abs(dy)) {
 
                             if (dx > 0) {
@@ -75,7 +85,6 @@ public class MonView extends View {
 
                         } else {
 
-                            // Mouvement principalement vertical
                             if (dy > 0) {
                                 direction = "down";
                             } else {
@@ -90,12 +99,54 @@ public class MonView extends View {
                 }
 
                 invalidate();
-
                 return true;
             }
         };
 
         setOnTouchListener(onTouchListener);
+
+        // -------------------------
+        // ACCELEROMETRE
+        // -------------------------
+        Sensor accelerometre;
+
+        SensorManager m =
+                (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+
+        accelerometre =
+                m.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        final SensorEventListener mSensorEventListener =
+                new SensorEventListener() {
+
+                    @Override
+                    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                    }
+
+                    @Override
+                    public void onSensorChanged(SensorEvent sensorEvent) {
+
+                        pencheH = -(int) (sensorEvent.values[0]);
+                        pencheV = (int) (sensorEvent.values[1]);
+
+                        penche =
+                                pencheH * pencheH
+                                        + pencheV * pencheV;
+
+                        Log.i(
+                                "accelerometre",
+                                "H=" + pencheH
+                                        + " V=" + pencheV
+                                        + " penche=" + penche
+                        );
+                    }
+                };
+
+        m.registerListener(
+                mSensorEventListener,
+                accelerometre,
+                SensorManager.SENSOR_DELAY_UI
+        );
     }
 
     @Override
@@ -104,7 +155,9 @@ public class MonView extends View {
 
         Paint p = new Paint();
 
-        // Fond noir
+        // -------------------------
+        // FOND NOIR
+        // -------------------------
         p.setColor(Color.BLACK);
         p.setStyle(Paint.Style.FILL);
 
@@ -116,7 +169,9 @@ public class MonView extends View {
                 p
         );
 
-        // Texte vert
+        // -------------------------
+        // TEXTE VERT
+        // -------------------------
         p.setColor(Color.GREEN);
         p.setTextSize(100);
         p.setTextAlign(Paint.Align.CENTER);
@@ -130,13 +185,14 @@ public class MonView extends View {
                 p
         );
 
-        // Charger l'image
+        // -------------------------
+        // IMAGE
+        // -------------------------
         Bitmap b = BitmapFactory.decodeResource(
                 getResources(),
                 R.drawable.images
         );
 
-        // Afficher l'image
         canvas.drawBitmap(
                 b,
                 200,
