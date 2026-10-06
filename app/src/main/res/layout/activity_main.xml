@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -8,19 +7,39 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/monTexte"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        tools:ignore="VisualLintSystemUi" />
-
-    <Button
-        android:id="@+id/button"
+    <!-- 1er TableRow : la zone de dessin -->
+    <TableRow
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="dessiner"
-        android:text="@string/button"
-        tools:ignore="VisualLintButtonSize,VisualLintSystemUi" />
+        android:layout_height="0dp"
+        android:layout_weight="8">
+
+        <com.example.tp1_test.MonView
+            android:id="@+id/plateau"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </TableRow>
+
+    <!-- 2e TableRow : le texte et le bouton -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/monTexte"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Hello World!" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="dessiner"
+            android:text="@string/button" />
+    </TableRow>
 
 </LinearLayout>
