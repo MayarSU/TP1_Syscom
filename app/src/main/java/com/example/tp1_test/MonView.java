@@ -8,10 +8,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class MonView extends View {
 
+    // Coordonnées pour détecter le mouvement
+    float x1, x2, y1, y2;
+
+    // Timer
     Handler timerHandler = new Handler();
 
     Runnable updateTimerThread = new Runnable() {
@@ -19,7 +25,7 @@ public class MonView extends View {
         public void run() {
             timerHandler.postDelayed(this, 100);
 
-            // Redemande l'affichage de la View
+            // Redessine la View
             invalidate();
         }
     };
@@ -27,7 +33,69 @@ public class MonView extends View {
     public MonView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        // Démarrage du timer
         timerHandler.postDelayed(updateTimerThread, 10);
+
+        // Listener pour détecter les mouvements tactiles
+        OnTouchListener onTouchListener = new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                float dx, dy;
+                String direction;
+
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_DOWN:
+
+                        x1 = event.getX();
+                        y1 = event.getY();
+
+                        Log.i("pacman", "appuyé");
+
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+
+                        x2 = event.getX();
+                        y2 = event.getY();
+
+                        dx = x2 - x1;
+                        dy = y2 - y1;
+
+                        // Mouvement principalement horizontal
+                        if (Math.abs(dx) > Math.abs(dy)) {
+
+                            if (dx > 0) {
+                                direction = "right";
+                            } else {
+                                direction = "left";
+                            }
+
+                        } else {
+
+                            // Mouvement principalement vertical
+                            if (dy > 0) {
+                                direction = "down";
+                            } else {
+                                direction = "up";
+                            }
+                        }
+
+                        Log.i("pacman", "laché " + direction);
+                        Log.i("pacman", "dx = " + dx + "; dy = " + dy);
+
+                        break;
+                }
+
+                invalidate();
+
+                return true;
+            }
+        };
+
+        setOnTouchListener(onTouchListener);
     }
 
     @Override
@@ -39,7 +107,14 @@ public class MonView extends View {
         // Fond noir
         p.setColor(Color.BLACK);
         p.setStyle(Paint.Style.FILL);
-        canvas.drawRect(0, 0, getWidth(), getHeight(), p);
+
+        canvas.drawRect(
+                0,
+                0,
+                getWidth(),
+                getHeight(),
+                p
+        );
 
         // Texte vert
         p.setColor(Color.GREEN);
@@ -62,6 +137,11 @@ public class MonView extends View {
         );
 
         // Afficher l'image
-        canvas.drawBitmap(b, 200, 200, p);
+        canvas.drawBitmap(
+                b,
+                200,
+                200,
+                p
+        );
     }
 }
