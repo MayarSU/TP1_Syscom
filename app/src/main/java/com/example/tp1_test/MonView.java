@@ -6,13 +6,28 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
 public class MonView extends View {
 
+    Handler timerHandler = new Handler();
+
+    Runnable updateTimerThread = new Runnable() {
+        @Override
+        public void run() {
+            timerHandler.postDelayed(this, 100);
+
+            // Redemande l'affichage de la View
+            invalidate();
+        }
+    };
+
     public MonView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        timerHandler.postDelayed(updateTimerThread, 10);
     }
 
     @Override
@@ -22,16 +37,17 @@ public class MonView extends View {
         Paint p = new Paint();
 
         // Fond noir
-        p.setColor(Color.BLUE);
+        p.setColor(Color.BLACK);
         p.setStyle(Paint.Style.FILL);
         canvas.drawRect(0, 0, getWidth(), getHeight(), p);
 
         // Texte vert
-        p.setColor(Color.BLACK);
+        p.setColor(Color.GREEN);
         p.setTextSize(100);
         p.setTextAlign(Paint.Align.CENTER);
 
         String texte = "Bonjour MONDE";
+
         canvas.drawText(
                 texte,
                 getWidth() / 2f,
@@ -39,7 +55,7 @@ public class MonView extends View {
                 p
         );
 
-        // Charger l'image depuis res/drawable/images.png
+        // Charger l'image
         Bitmap b = BitmapFactory.decodeResource(
                 getResources(),
                 R.drawable.images
